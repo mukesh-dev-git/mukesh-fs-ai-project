@@ -1,0 +1,21 @@
+# Data and model weights are downloaded at runtime, never committed
+data/
+keyframes/
+*.pt
+*.pth
+*.onnx
+case_report.json
+
+# Python
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+
+# Node (Phase 2)
+node_modules/
+.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
