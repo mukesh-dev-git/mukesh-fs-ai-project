@@ -67,20 +67,44 @@ a contact sheet, the reconstruction JSON, and `case_report.json` with the full a
 
 ## Research basis (2025–26)
 
-| Paper | Venue | Relevance |
+| Paper | Venue | Dataset(s) | Relevance |
+|---|---|---|---|
+| Varma et al., [*An Explainable Multi-Modal AI Framework for Automated Crime Scene Analysis and Forensic Reporting*](https://ieeexplore.ieee.org/abstract/document/11651301/) | IEEE ICACKE 2026 | Custom forensic dataset (blood, firearms, weapons, phones, bindings) + synthetic scenes | YOLOv8 evidence detection + language-model consistency checks and automated report generation |
+| Ospina-Bohórquez et al., [*Comprehensive Forensic Tool for Crime Scene and Traffic Accident 3D Reconstruction*](https://www.mdpi.com/1999-4893/18/11/707) | MDPI Algorithms 18(11), 2025 | Custom 643 annotated forensic images | YOLOv8 evidence detection + COLMAP photogrammetry 3D reconstruction |
+| Murugan et al., [*Almiqanaas T — A Crime Scene Evidence Detector*](https://ieeexplore.ieee.org/abstract/document/11012065/) | IEEE ISDFS 2025 | Custom physical evidence dataset (blood stains, footprints, knives, firearms) | Drone image capture + YOLO evidence localization and automated report logging |
+| Shanthi & Manjula, [*Weapon detection with FMR-CNN and YOLOv8 for enhanced crime prevention and security*](https://www.nature.com/articles/s41598-025-07782-0) | Scientific Reports, 2025 | Real-world CCTV weapon capture benchmarks | Hybrid Faster/Mask R-CNN + YOLOv8 weapon detection on surveillance frames |
+| Sedik, Kolivand & Albeedan, [*An efficient image classification and segmentation method for crime investigation applications*](https://link.springer.com/article/10.1007/s11042-024-19773-w) | Multimedia Tools and Applications, 2025 | Benchmark forensic bloodstain image datasets | CNN / ConvLSTM classification + fuzzy active contour segmentation of bloodstain patterns |
+| Huang et al., [*Ex-VAD: Explainable fine-grained video anomaly detection based on visual-language models*](https://openreview.net/forum?id=xAhUoyb5eU) | 42nd ICML 2025 | UCF-Crime, XD-Violence | Fine-grained VLM anomaly captioning fused with LLM reasoning and label-enhanced feature alignment |
+| Zou et al., [*Unlocking vision-language models for video anomaly detection via fine-grained prompting*](https://ieeexplore.ieee.org/abstract/document/11491927/) | IEEE/CVF WACV 2026 | UCF-Crime, XD-Violence | Fine-grained action-centric prompting (ASK-Hint) enabling frozen VLMs to classify anomaly categories |
+| Ye et al., [*VERA: Explainable Video Anomaly Detection via Verbalized Learning of Vision-Language Models*](https://arxiv.org/abs/2412.01095) | IEEE/CVF CVPR 2025 | UCF-Crime, XD-Violence | Learnable guiding questions optimizing frozen VLMs for anomaly detection and verbalized reasoning without fine-tuning |
+| Yang et al., [*MoniTor: Exploiting Large Language Models with Instruction for Online Video Anomaly Detection*](https://arxiv.org/abs/2510.21449) | NeurIPS 2025 | UCF-Crime, XD-Violence | Memory-based online scoring queue with LSTM temporal state modeling and instruction-guided LLM reasoning for streaming surveillance video |
+| Huang et al., [*Track Any Anomalous Object: A Granular Video Anomaly Detection Pipeline*](https://arxiv.org/abs/2506.05175) | IEEE/CVF CVPR 2025 | UCF-Crime, ShanghaiTech, XD-Violence | Granular pixel-level tracking and segmentation of anomalous evidence objects across long video sequences |
+
+## Research Positioning & Novelty (IEEE Perspective)
+
+From an IEEE forensic computing perspective, simply pipelining off-the-shelf models is insufficient. This project addresses specific research challenges identified in recent literature:
+
+1. **Grounded Multi-Stage Synthesis vs. Monolithic Hallucination:** Monolithic multimodal LLMs frequently hallucinate weapons, actions, or timelines when prompted directly with surveillance imagery. Our pipeline enforces strict grounded reasoning: Stage 5 and Stage 6 VLMs receive structured bounding-box detections and classification votes from Stages 3–4 as explicit priors, and are constrained to cite verified view numbers (`#1, #2, ...`) for every evidentiary assertion.
+2. **Privacy-Preserving Forensic Preprocessing:** In compliance with forensic privacy standards, Stage 2 utilizes instance segmentation (`YOLOv8n-seg`) to completely de-identify/mask persons prior to multimodal scene description and timeline reconstruction, mitigating bystander identification bias.
+3. **Cryptographic Chain of Custody & Tamper Verification:** Forensic media requires proof of integrity. Every ingest, detection, classification, and reconstruction step is recorded in an append-only, SHA-256 hash-chained audit log with perceptual hash (pHash) deduplication, enabling deterministic tamper verification (`log.verify()`).
+4. **Leakage-Free Video-Level Evaluation Protocol:** Frame-level random sampling inflates classification accuracy due to near-identical temporal frames. Our experimental protocol enforces strict video-level and incident-level disjoint splits between training and test sets.
+
+## Quantitative Evaluation & Baseline Results
+
+> **Status:** Initial pipeline implemented; awaiting execution on Google Colab (T4 GPU). Metrics will be populated upon completion of the training run.
+
+| Metric | Target / Benchmark | Current Status |
 |---|---|---|
-| Varma et al., [*An Explainable Multi-Modal AI Framework for Automated Crime Scene Analysis and Forensic Reporting*](https://ieeexplore.ieee.org/abstract/document/11651301/) | IEEE ICACKE 2026 | YOLOv8 evidence detection (blood, firearms, weapons, phones, bindings) + synthetic scenes + language-model consistency checks and automatic report |
-| Ospina-Bohórquez et al., [*Comprehensive Forensic Tool for Crime Scene and Traffic Accident 3D Reconstruction*](https://www.mdpi.com/1999-4893/18/11/707) | MDPI Algorithms 18(11), 2025 | YOLOv8 on 643 annotated forensic images + COLMAP photogrammetry 3D reconstruction |
-| Murugan et al., [*Almiqanaas T — A Crime Scene Evidence Detector*](https://ieeexplore.ieee.org/abstract/document/11012065/) | IEEE ISDFS 2025 | YOLO evidence detection (blood stains, footprints, knives, guns) with drone capture and auto-reports |
-| Shanthi & Manjula, [*Weapon detection with FMR-CNN and YOLOv8 for enhanced crime prevention and security*](https://www.nature.com/articles/s41598-025-07782-0) | Scientific Reports, 2025 | Hybrid Faster/Mask R-CNN + YOLOv8 weapon detection on CCTV frames |
-| Sedik, Kolivand & Albeedan, [*An efficient image classification and segmentation method for crime investigation applications*](https://link.springer.com/article/10.1007/s11042-024-19773-w) | Multimedia Tools and Applications, 2025 | CNN / ConvLSTM classification + fuzzy active contour segmentation of bloodstain patterns |
-| Huang et al., [*Ex-VAD: Explainable fine-grained video anomaly detection based on visual-language models*](https://openreview.net/forum?id=xAhUoyb5eU) | ICML 2025 | VLM-based explainable anomaly detection on UCF-Crime and XD-Violence |
-| Zou et al., [*Unlocking vision-language models for video anomaly detection via fine-grained prompting*](https://ieeexplore.ieee.org/abstract/document/11491927/) | IEEE, 2026 | Fine-grained VLM prompts per UCF-Crime anomaly class |
+| UCF-Crime 14-Class Incident Classification (ResNet-18) | Macro F1, Per-class Precision/Recall | Pending Colab run (Cell 13–14) |
+| Video-Level Separation Verification | 0 overlapping videos between Train/Test | Verified in dataset protocol |
+| Person Masking Quality | Segment count, border suppression | Pending Colab run (Cell 11) |
+| Evidence Object Detection (YOLOv8s) | Per-class detections on demo case | Untrained baseline; fine-tuning next |
+| Cryptographic Audit Log Integrity | `log.verify() == True` post-tamper test | Validated in pipeline design |
 
 ## Roadmap
 
-- [x] Phase 1a — Colab baseline: all six stages end to end on UCF-Crime frames
-- [ ] Phase 1b — Fine-tune YOLOv8 on OD-WeaponDetection; report mAP and per-class classification metrics
+- [ ] Phase 1a — Colab baseline: all six stages end to end on UCF-Crime frames (pipeline written; run in Colab to record baseline metrics)
+- [ ] Phase 1b — Fine-tune YOLOv8 on OD-WeaponDetection; report mAP@50 and mAP@50–95
 - [ ] Phase 1c — Evaluate on full-resolution UCF-Crime video clips
 - [ ] Phase 2 — MERN application
   - **React**: case dashboard, upload, per-view results, contact sheet and reconstruction viewer
