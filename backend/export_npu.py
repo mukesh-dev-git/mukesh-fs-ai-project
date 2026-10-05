@@ -63,13 +63,13 @@ def export_model_to_onnx(pth_path=None, onnx_path=None):
         available = ort.get_available_providers()
         print("Available providers:", available)
 
-        # Select NPU provider if available, otherwise DML (GPU) or CPU
+        # Select DirectML (GPU/NPU hardware acceleration) or CPU
         preferred_providers = []
-        if "VitisAIExecutionProvider" in available:
-            preferred_providers.append("VitisAIExecutionProvider")
         if "DmlExecutionProvider" in available:
             preferred_providers.append("DmlExecutionProvider")
         preferred_providers.append("CPUExecutionProvider")
+        if "VitisAIExecutionProvider" in available:
+            preferred_providers.append("VitisAIExecutionProvider")
 
         session = ort.InferenceSession(str(onnx_path), providers=preferred_providers)
         active_providers = session.get_providers()
