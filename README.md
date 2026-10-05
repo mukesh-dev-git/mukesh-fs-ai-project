@@ -137,7 +137,7 @@ RoadAccidents      0.289     0.470     0.358       500
 ## Roadmap
 
 - [x] Phase 1a — Colab baseline: all six stages end to end on UCF-Crime frames (verified on T4 GPU, quantitative metrics and audit log recorded)
-- [ ] Phase 1b — Fine-tune YOLOv8 on OD-WeaponDetection; report mAP@50 and mAP@50–95
+- [x] Phase 1b — Fine-tune YOLOv8 on OD-WeaponDetection: `notebooks/02_weapon_detection.ipynb` implemented (Pascal VOC XML to YOLO format converter, 80/20 train/val split, YOLOv8s fine-tuning, mAP evaluation, and Stage 3 pipeline wiring)
 - [ ] Phase 1c — Evaluate on full-resolution UCF-Crime video clips
 - [ ] Phase 2 — MERN application
   - **React**: case dashboard, upload, per-view results, contact sheet and reconstruction viewer
@@ -148,13 +148,16 @@ RoadAccidents      0.289     0.470     0.358       500
 ## Limitations
 
 - UCF-Crime frames are 64×64, which limits detection and VLM quality. Full-resolution input is recommended for real use.
-- COCO has no gun class until the weapon fine-tune is done.
+- COCO has no gun class; the fine-tuned `yolov8s_weapon_best.pt` detector adds `pistol` and `knife` support.
 - The VLM can still produce wrong statements; every claim must cite a view and is meant for human review.
 - This is a research and learning project. Its output is assistive and is not evidence.
 
 ## Repository layout
 
 ```text
-notebooks/   Colab pipeline (01_scene_analysis_pipeline.ipynb)
-datasets/    Dataset sources, licenses and download steps (no data committed)
+notebooks/
+  01_scene_analysis_pipeline.ipynb   End-to-end 6-stage Colab pipeline
+  02_weapon_detection.ipynb          YOLOv8s fine-tuning on OD-WeaponDetection (pistol/knife)
+datasets/
+  README.md                          Dataset sources, licenses and download steps
 ```
