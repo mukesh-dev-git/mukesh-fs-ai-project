@@ -138,12 +138,11 @@ RoadAccidents      0.289     0.470     0.358       500
 
 - [x] Phase 1a — Colab baseline: all six stages end to end on UCF-Crime frames (verified on T4 GPU, quantitative metrics and audit log recorded)
 - [x] Phase 1b — Fine-tune YOLOv8 on OD-WeaponDetection: `notebooks/02_weapon_detection.ipynb` implemented (Pascal VOC XML to YOLO format converter, 80/20 train/val split, YOLOv8s fine-tuning, mAP evaluation, and Stage 3 pipeline wiring)
-- [ ] Phase 1c — Evaluate on full-resolution UCF-Crime video clips
-- [ ] Phase 2 — MERN application
-  - **React**: case dashboard, upload, per-view results, contact sheet and reconstruction viewer
-  - **Express / Node**: case and upload APIs, audit-log endpoints, job queue
-  - **MongoDB**: cases, views, detections, reconstructions, hash-chained audit log
-  - **Python inference service** (FastAPI) exposing the notebook stages, called by Express
+- [x] Phase 2 — Full-Stack MERN Application & Hardware-Accelerated AI Service
+  - **React Dashboard (`frontend/`)**: Interactive investigator workspace with per-view privacy masking, evidence inspection, contact sheet, timeline reconstruction, and live cryptographic audit log viewer.
+  - **Express / Node API (`server/`)**: MERN API backend proxying pipeline jobs, managing case uploads, and interfacing with database.
+  - **Python Inference Service (`backend/`)**: FastAPI pipeline engine running ResNet-18 classification on AMD Ryzen AI hardware (`DmlExecutionProvider` / NPU) alongside YOLOv8 privacy masking and evidence detection.
+  - **Model Exporter (`backend/export_npu.py`)**: Converts trained PyTorch checkpoints (`.pth`) to optimized ONNX models for local laptop acceleration.
 
 ## Limitations
 
@@ -155,6 +154,10 @@ RoadAccidents      0.289     0.470     0.358       500
 ## Repository layout
 
 ```text
+backend/     FastAPI AI inference service, NPU export, and 6-stage pipeline
+frontend/    React investigator dashboard (Vite + modern forensic UI)
+server/      Express MERN API backend
+models/      Trained checkpoints, ONNX graphs, and NPU download guide
 notebooks/
   01_scene_analysis_pipeline.ipynb   End-to-end 6-stage Colab pipeline
   02_weapon_detection.ipynb          YOLOv8s fine-tuning on OD-WeaponDetection (pistol/knife)

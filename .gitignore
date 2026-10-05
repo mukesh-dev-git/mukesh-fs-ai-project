@@ -13,7 +13,14 @@ __pycache__/
 
 # Node (Phase 2)
 node_modules/
+dist/
+temp_uploads/
 .env
+
+# Compiler / runtime artifacts
+*-signature.txt
+*.csv
+Work/
 
 # OS / editor
 .DS_Store
