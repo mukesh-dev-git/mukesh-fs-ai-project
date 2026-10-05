@@ -91,19 +91,52 @@ From an IEEE forensic computing perspective, simply pipelining off-the-shelf mod
 
 ## Quantitative Evaluation & Baseline Results
 
-> **Status:** Initial pipeline implemented; awaiting execution on Google Colab (T4 GPU). Metrics will be populated upon completion of the training run.
+The baseline pipeline was executed end-to-end on Google Colab (Tesla T4 GPU, 15 GB VRAM).
 
-| Metric | Target / Benchmark | Current Status |
-|---|---|---|
-| UCF-Crime 14-Class Incident Classification (ResNet-18) | Macro F1, Per-class Precision/Recall | Pending Colab run (Cell 13–14) |
-| Video-Level Separation Verification | 0 overlapping videos between Train/Test | Verified in dataset protocol |
-| Person Masking Quality | Segment count, border suppression | Pending Colab run (Cell 11) |
-| Evidence Object Detection (YOLOv8s) | Per-class detections on demo case | Untrained baseline; fine-tuning next |
-| Cryptographic Audit Log Integrity | `log.verify() == True` post-tamper test | Validated in pipeline design |
+### Stage 4: ResNet-18 Incident-Type Classification Report
+
+- **Model:** ResNet-18 (ImageNet pretrained backbone, fine-tuned linear head)
+- **Training Setup:** 3 epochs, AdamW optimizer ($\text{lr} = 3\times 10^{-4}$), batch size 128, class-balanced sample (3,000 frames/class from `Train`).
+- **Training Loss:** Epoch 1: 0.308 → Epoch 2: 0.055 → Epoch 3: 0.043.
+- **Evaluation Split:** Test split (6,797 total frames across 14 classes, 64×64 input resolution).
+
+```text
+               precision    recall  f1-score   support
+
+        Abuse      0.063     0.024     0.034       297
+       Arrest      0.116     0.022     0.037       500
+        Arson      0.183     0.298     0.227       500
+      Assault      0.027     0.016     0.020       500
+     Burglary      0.200     0.190     0.195       500
+    Explosion      0.293     0.034     0.061       500
+     Fighting      0.151     0.110     0.127       500
+ NormalVideos      0.213     0.358     0.267       500
+RoadAccidents      0.289     0.470     0.358       500
+      Robbery      0.094     0.154     0.117       500
+     Shooting      0.009     0.002     0.003       500
+  Shoplifting      0.195     0.108     0.139       500
+     Stealing      0.119     0.160     0.136       500
+    Vandalism      0.000     0.000     0.000       500
+
+     accuracy                          0.142      6797
+    macro avg      0.139     0.139     0.123      6797
+ weighted avg      0.142     0.142     0.126      6797
+```
+
+> **Analysis & Untrained Components:**
+> - Low-resolution 64×64 surveillance crops restrict single-frame spatial discernment for subtle incidents (e.g. Shooting: 0.003 F1, Assault: 0.020 F1), while distinct visual signatures (RoadAccidents: 0.358 F1, NormalVideos: 0.267 F1, Arson: 0.227 F1) achieve higher recall.
+> - Single-frame classification without temporal modeling underscores the critical need for a temporal video model (Task 4) and full-resolution video evaluation (Phase 1c).
+> - Evidence detector (`YOLOv8s`) currently uses generic COCO weights without weapon fine-tuning; weapon-specific detection is pending Task 3.
+
+### Stage 1 & 6: Cryptographic Chain of Custody & Audit Integrity
+
+- **Demo Case:** `Burglary032_x264` (1,580 frames total; 12 sampled; 10 kept after pHash deduplication).
+- **Audit Verification on Execution:** `log.verify() == True` across all ingest, masking, detection, classification, and reconstruction events.
+- **Tamper Simulation:** Mutating a single historical record in memory immediately invalidated the chain: `log.verify() == False`.
 
 ## Roadmap
 
-- [ ] Phase 1a — Colab baseline: all six stages end to end on UCF-Crime frames (pipeline written; run in Colab to record baseline metrics)
+- [x] Phase 1a — Colab baseline: all six stages end to end on UCF-Crime frames (verified on T4 GPU, quantitative metrics and audit log recorded)
 - [ ] Phase 1b — Fine-tune YOLOv8 on OD-WeaponDetection; report mAP@50 and mAP@50–95
 - [ ] Phase 1c — Evaluate on full-resolution UCF-Crime video clips
 - [ ] Phase 2 — MERN application
