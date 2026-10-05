@@ -99,6 +99,21 @@ app.post('/api/cases', upload.array('files'), async (req, res) => {
   }
 });
 
+// Ingest Preset Demo Case
+app.post('/api/demo-case', async (req, res) => {
+  try {
+    const { preset } = req.body;
+    const form = new FormData();
+    form.append('preset', preset || 'armed_evidence');
+    const aiRes = await axios.post(`${AI_SERVICE_URL}/api/demo-case`, form, {
+      headers: form.getHeaders()
+    });
+    res.json(aiRes.data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load demo case', details: err.response?.data || err.message });
+  }
+});
+
 // Audit Log Verification
 app.get('/api/cases/:id/audit', async (req, res) => {
   try {

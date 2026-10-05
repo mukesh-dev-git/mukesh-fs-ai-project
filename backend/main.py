@@ -135,6 +135,52 @@ async def create_and_analyze_case(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Pipeline processing failed: {str(e)}")
 
+@app.post("/api/demo-case")
+def create_demo_case(preset: str = Form("armed_evidence")):
+    test_images_dir = BASE_DIR / "test_images"
+    presets = {
+        "armed_evidence": {
+            "case_id": "CASE-DEMO-ARMED-EVIDENCE",
+            "files": ["evidence_sharp_weapons.jpg", "street_scene_pedestrians.jpg"]
+        },
+        "burglary_sequence": {
+            "case_id": "CASE-DEMO-BURGLARY-UCF",
+            "files": ["burglary_scene_view_01.png", "burglary_scene_view_02.png", "burglary_scene_view_03.png", "burglary_scene_view_04.png"]
+        },
+        "vehicular_accident": {
+            "case_id": "CASE-DEMO-TRAFFIC-COLLISION",
+            "files": ["traffic_accident_collision.jpg", "motorcycle_traffic_incident.jpg"]
+        }
+    }
+
+    config = presets.get(preset, presets["armed_evidence"])
+    case_id = config["case_id"]
+    case_upload_dir = UPLOADS_DIR / case_id
+    case_output_dir = CASES_DIR / case_id
+    case_upload_dir.mkdir(parents=True, exist_ok=True)
+    case_output_dir.mkdir(parents=True, exist_ok=True)
+
+    file_paths = []
+    for fname in config["files"]:
+        src = test_images_dir / fname
+        if src.exists():
+            dest = case_upload_dir / fname
+            shutil.copy(str(src), str(dest))
+            file_paths.append(dest)
+
+    if not file_paths:
+        raise HTTPException(status_code=400, detail="Demo test files not found")
+
+    report = pipeline.process_case(case_id, file_paths, case_output_dir)
+    return {
+        "message": "Demo case loaded successfully",
+        "case_id": case_id,
+        "incident_type": report["incident_type"],
+        "accelerator": report["accelerator"],
+        "views_processed": len(report["views"]),
+        "audit_log_valid": report["audit_log_valid"]
+    }
+
 @app.get("/api/cases/{case_id}/audit")
 def verify_audit_log(case_id: str):
     case_folder = CASES_DIR / case_id

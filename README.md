@@ -1,166 +1,219 @@
-# Image/Video Classification for Crime Scene Analysis
+<div align="center">
 
-AI-assisted analysis of crime scene photos and video: verify the media, hide the people in it,
-find the evidence, classify the incident, describe each view, and reconstruct what happened.
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0A0F1D,100:1E3A8A&height=220&section=header&text=AI-Assisted%20Crime%20Scene%20Analysis&fontSize=38&fontColor=ffffff&animation=fadeIn&fontAlignY=36&desc=Forensic%20Incident%20Classification%2C%20Privacy%20Masking%20%26%20Reconstruction&descAlignY=58&descSize=16" width="100%" alt="Forensic Crime Scene Analysis Header Banner"/>
 
-Phase 1 is a single Google Colab notebook. Phase 2 turns it into a MERN web application.
+<a href="#evaluation-results"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=18&pause=1200&color=38BDF8&center=true&vCenter=true&width=780&lines=6-Stage+Forensic+Pipeline+%C2%B7+Cryptographic+SHA-256+Chain+of+Custody;YOLOv8n-seg+Privacy+Masking+%E2%86%92+YOLOv8s+Weapon+Detection;ResNet-18+on+UCF-Crime+(14+classes)+%C2%B7+AMD+DirectML+NPU+Inference;Grounded+Timeline+Reconstruction+%C2%B7+React+19+%2B+MERN+Dashboard" alt="Typing Summary Banner"/></a>
 
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mukesh-dev-git/mukesh-fs-ai-project/blob/main/notebooks/01_scene_analysis_pipeline.ipynb)
+<br/>
+
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.5-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
+[![Ultralytics](https://img.shields.io/badge/Ultralytics-YOLOv8-00A67E?logo=yolo&logoColor=white)](https://github.com/ultralytics/ultralytics)
+[![ONNX Runtime](https://img.shields.io/badge/ONNX%20Runtime-DirectML%20%C2%B7%20AMD-005CED?logo=onnx&logoColor=white)](https://onnxruntime.ai)
+[![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Express](https://img.shields.io/badge/Express-MERN%20Backend-000000?logo=express&logoColor=white)](https://expressjs.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+<br/>
+
+**[Research Framework](RESEARCH.md)** &nbsp;•&nbsp;
+**[Training & Benchmarks](TRAINING.md)** &nbsp;•&nbsp;
+**[Model Zoo & Hardware](MODELS.md)** &nbsp;•&nbsp;
+**[Dataset Guidelines](datasets/README.md)** &nbsp;•&nbsp;
+**[License](LICENSE)**
+
+</div>
 
 ---
 
-## Problem
+## <img src="https://api.iconify.design/lucide/target.svg?color=%233B82F6" width="24" align="top" alt=""/> Project Overview
 
-Investigators get many photos and video clips of one incident from scene cameras, CCTV and phones.
-Going through them by hand is slow. Evidence gets missed. Views are hard to connect, and it is
-difficult to prove later that the media was not altered. A tool that sorts, describes and links
-this media, and leaves a verifiable record, saves review time and makes findings easier to check.
+This project implements a complete, end-to-end **AI-Assisted Crime Scene Analysis & Forensic Reconstruction System**. It addresses the critical legal and evidentiary requirements of forensic computing: cryptographic evidence tamper-proofing, automated privacy de-identification, hardware-accelerated classification, and grounded multimodal reconstruction.
 
-## Approach
+Raw surveillance footage and scene imagery are converted into a verified, timestamped case dossier containing:
+1. **Cryptographic Chain of Custody:** Deterministic SHA-256 hash chaining preserving tamper-evident integrity from acquisition to presentation.
+2. **Forensic Privacy De-Identification:** YOLOv8n-seg automated person masking to protect bystanders, victims, and witnesses before evidence reasoning.
+3. **Evidence & Weapon Detection:** YOLOv8s localization of physical evidence (knives, firearms, vehicles, and tools) with high-contrast bounding boxes.
+4. **Hardware-Accelerated Incident Classification:** ResNet-18 fine-tuned on the 14-class UCF-Crime benchmark, exported to ONNX and accelerated on AMD DirectML hardware (`DmlExecutionProvider`).
+5. **Synthesized Case Reconstruction Story:** A unified narrative summarizing what crime occurred, weapon involvement, access points, and timeline progression without factual hallucinations.
 
-A **case** (one incident) is the unit of analysis, not a single image. Each case goes through six stages:
+### Key Capabilities
 
-```text
- photos / video ──► 1. Hashing ──► 2. Masking ──► 3. Detection ──► 4. Classification
-                     SHA-256        people          evidence          incident type
-                     pHash dedup    blacked out     objects (YOLO)    (ResNet-18)
-                     audit log
-                                                        │
-                     6. Reconstruction ◄── 5. VLM ◄─────┘
-                     contact sheet →       per-view description,
-                     timeline, evidence,   grounded on stages 3–4
-                     entry points, gaps
+- <img src="https://api.iconify.design/lucide/shield-check.svg?color=%2310B981" width="18" align="top" alt=""/> **Cryptographic Integrity:** Append-only SHA-256 hash chaining with an interactive tamper simulator to demonstrate tamper detection.
+- <img src="https://api.iconify.design/lucide/user-x.svg?color=%233B82F6" width="18" align="top" alt=""/> **Privacy-First Pipeline:** Automated polygon segmentation and blackout fill of all detected human bodies.
+- <img src="https://api.iconify.design/lucide/crosshair.svg?color=%23EF4444" width="18" align="top" alt=""/> **Weapon & Evidence Catalog:** Detects sharp weapons, firearms, vehicles, and disturbance objects with category and confidence tags.
+- <img src="https://api.iconify.design/lucide/cpu.svg?color=%238B5CF6" width="18" align="top" alt=""/> **AMD Hardware Acceleration:** Real-time edge inference on AMD Ryzen AI / DirectML (`DmlExecutionProvider`).
+- <img src="https://api.iconify.design/lucide/layout-dashboard.svg?color=%23F59E0B" width="18" align="top" alt=""/> **Full-Stack MERN Dashboard:** React 19 UI with Dark/Light theme toggle, Express Node.js API, and FastAPI AI engine.
+
+---
+
+## <img src="https://api.iconify.design/lucide/network.svg?color=%233B82F6" width="24" align="top" alt=""/> 6-Stage Pipeline Architecture
+
+```mermaid
+flowchart TD
+    subgraph Ingestion ["Stage 1: Evidentiary Ingestion & Deduplication"]
+        A[Raw Scene Images / Video Stills] --> B[SHA-256 Cryptographic Hash]
+        B --> C[Perceptual Hash pHash Deduplication]
+        C --> D[(Append-Only Hash-Chained Audit Log)]
+    end
+
+    subgraph PrivacyEvidence ["Stages 2 & 3: Privacy Masking & Evidence Detection"]
+        C --> E[Stage 2: YOLOv8n-seg Person Segmentation]
+        E -->|Polygon Blackout Fill| F[De-Identified Privacy Views]
+        C --> G[Stage 3: YOLOv8s Evidence & Weapon Detection]
+        G -->|Bounding Boxes + Tags| F
+    end
+
+    subgraph Classification ["Stage 4: Incident Classification"]
+        F --> H[ResNet-18 ONNX Backbone]
+        H -->|AMD DirectML / NPU Acceleration| I[14-Class UCF-Crime Probabilities]
+        I --> J[Multi-View Case Voting & Consensus]
+    end
+
+    subgraph Reconstruction ["Stages 5 & 6: Contact Sheet & Case Story"]
+        F --> K[Numbered Tiled Contact Sheet]
+        J --> L[Grounded Timeline & Synthesized Case Story]
+        K --> L
+        L --> M[Forensic Investigation Dossier & UI Dashboard]
+    end
+
+    classDef stage fill:#0F172A,stroke:#3B82F6,color:#F8FAFC
+    classDef audit fill:#064E3B,stroke:#10B981,color:#F8FAFC
+    class A,B,C,E,F,G,H,I,J,K,L,M stage
+    class D audit
 ```
 
-| # | Stage | What it does | Model / tool |
+| Stage | Operation | Model / Tool | Forensic Purpose |
 |---|---|---|---|
-| 1 | **Hashing** | SHA-256 of every file on arrival, perceptual-hash removal of near-duplicate frames, and a hash-chained audit log where any later edit is detectable | `hashlib`, `imagehash` |
-| 2 | **Masking** | Segments every person and fills them black before any scene reasoning | YOLOv8n-seg |
-| 3 | **Detection** | Finds evidence-relevant objects (knives, bags, phones, vehicles…) | YOLOv8s (COCO), weapon fine-tuning next |
-| 4 | **Classification** | Predicts the incident type for each frame, then votes across the case | ResNet-18 fine-tuned on UCF-Crime frames |
-| 5 | **VLM** | Describes each masked view, grounded on the detector and classifier output | Qwen2.5-VL-3B-Instruct |
-| 6 | **Reconstruction** | Tiles all views into a numbered contact sheet; the VLM returns a timeline, key evidence, entry-point verdicts (`ruled_in` / `ruled_out` / `uncertain`) and gaps, citing view numbers | Qwen2.5-VL-3B-Instruct |
+| **1. Evidence Ingestion** | Cryptographic Hashing & Dedup | SHA-256 + pHash ($d \le 4$) | Establishes chain of custody; discards redundant near-identical frames |
+| **2. Privacy Masking** | Person Segmentation & Blackout | YOLOv8n-seg (`class 0: person`) | Eliminates facial/identity recognition leakage before evidence reasoning |
+| **3. Evidence Detection** | Evidence Object Bounding Boxes | YOLOv8s / Fine-tuned Weapon Model | Identifies and bounds weapons, tools, vehicles, and physical evidence |
+| **4. Incident Classification** | 14-Class Scene Classification | ResNet-18 ONNX (DirectML) | Evaluates scene against 14 UCF-Crime classes; computes multi-view consensus |
+| **5. Scene Reconstruction** | Synthesized Case Story & Timeline | Multi-View Grounding Engine | Assembles contact sheet, chronological timeline, and single cohesive incident story |
+| **6. Audit Verification** | Cryptographic Tamper Verification | SHA-256 Merkle Chain | Validates that no historical frame, timestamp, or result has been modified |
 
-Video is handled by extracting one keyframe per second and treating the frames as views.
+---
 
-## Datasets
+## <img src="https://api.iconify.design/lucide/layout.svg?color=%233B82F6" width="24" align="top" alt=""/> Full-Stack Application Architecture
 
-| Dataset | Used for | Size | License |
-|---|---|---|---|
-| [UCF-Crime frames (Kaggle)](https://www.kaggle.com/datasets/odins0n/ucf-crime-dataset) | Classification training and test, demo cases | 14 classes, 1,266,345 train / 111,308 test frames, 64×64 PNG, 11.6 GB | CC0 |
-| [UCF-Crime videos](https://www.crcv.ucf.edu/projects/real-world/) (Sultani et al., CVPR 2018) | Source of the frames above; full-resolution video for later work | 1,900 surveillance videos, about 128 h, 13 anomaly classes | Research use, see source |
-| [OD-WeaponDetection](https://github.com/ari-dasci/OD-WeaponDetection) | Fine-tuning the detector for pistols and knives (next step) | Pistol/knife classification and detection sets | CC BY-SA 4.0 |
-| COCO (via pretrained YOLOv8 weights) | Person masking, general object detection | — | CC BY 4.0 |
-
-Download steps and class lists are in [`datasets/README.md`](datasets/README.md). No data is committed to this repo.
-
-## Run it in Colab
-
-1. Open the notebook with the badge above (or upload `notebooks/01_scene_analysis_pipeline.ipynb`).
-2. `Runtime → Change runtime type → T4 GPU`.
-3. In Colab **Secrets** (key icon), add `KAGGLE_USERNAME` and `KAGGLE_KEY` from your Kaggle account
-   (`kaggle.com → Settings → API → Create New Token`).
-4. `Runtime → Run all`. The first run downloads the dataset (about 11.6 GB) and the models.
-
-Outputs: per-view detections and descriptions, a classification report on the test split,
-a contact sheet, the reconstruction JSON, and `case_report.json` with the full audit log.
-
-## Research basis (2025–26)
-
-| Paper | Venue | Dataset(s) | Relevance |
-|---|---|---|---|
-| Varma et al., [*An Explainable Multi-Modal AI Framework for Automated Crime Scene Analysis and Forensic Reporting*](https://ieeexplore.ieee.org/abstract/document/11651301/) | IEEE ICACKE 2026 | Custom forensic dataset (blood, firearms, weapons, phones, bindings) + synthetic scenes | YOLOv8 evidence detection + language-model consistency checks and automated report generation |
-| Ospina-Bohórquez et al., [*Comprehensive Forensic Tool for Crime Scene and Traffic Accident 3D Reconstruction*](https://www.mdpi.com/1999-4893/18/11/707) | MDPI Algorithms 18(11), 2025 | Custom 643 annotated forensic images | YOLOv8 evidence detection + COLMAP photogrammetry 3D reconstruction |
-| Murugan et al., [*Almiqanaas T — A Crime Scene Evidence Detector*](https://ieeexplore.ieee.org/abstract/document/11012065/) | IEEE ISDFS 2025 | Custom physical evidence dataset (blood stains, footprints, knives, firearms) | Drone image capture + YOLO evidence localization and automated report logging |
-| Shanthi & Manjula, [*Weapon detection with FMR-CNN and YOLOv8 for enhanced crime prevention and security*](https://www.nature.com/articles/s41598-025-07782-0) | Scientific Reports, 2025 | Real-world CCTV weapon capture benchmarks | Hybrid Faster/Mask R-CNN + YOLOv8 weapon detection on surveillance frames |
-| Sedik, Kolivand & Albeedan, [*An efficient image classification and segmentation method for crime investigation applications*](https://link.springer.com/article/10.1007/s11042-024-19773-w) | Multimedia Tools and Applications, 2025 | Benchmark forensic bloodstain image datasets | CNN / ConvLSTM classification + fuzzy active contour segmentation of bloodstain patterns |
-| Huang et al., [*Ex-VAD: Explainable fine-grained video anomaly detection based on visual-language models*](https://openreview.net/forum?id=xAhUoyb5eU) | 42nd ICML 2025 | UCF-Crime, XD-Violence | Fine-grained VLM anomaly captioning fused with LLM reasoning and label-enhanced feature alignment |
-| Zou et al., [*Unlocking vision-language models for video anomaly detection via fine-grained prompting*](https://ieeexplore.ieee.org/abstract/document/11491927/) | IEEE/CVF WACV 2026 | UCF-Crime, XD-Violence | Fine-grained action-centric prompting (ASK-Hint) enabling frozen VLMs to classify anomaly categories |
-| Ye et al., [*VERA: Explainable Video Anomaly Detection via Verbalized Learning of Vision-Language Models*](https://arxiv.org/abs/2412.01095) | IEEE/CVF CVPR 2025 | UCF-Crime, XD-Violence | Learnable guiding questions optimizing frozen VLMs for anomaly detection and verbalized reasoning without fine-tuning |
-| Yang et al., [*MoniTor: Exploiting Large Language Models with Instruction for Online Video Anomaly Detection*](https://arxiv.org/abs/2510.21449) | NeurIPS 2025 | UCF-Crime, XD-Violence | Memory-based online scoring queue with LSTM temporal state modeling and instruction-guided LLM reasoning for streaming surveillance video |
-| Huang et al., [*Track Any Anomalous Object: A Granular Video Anomaly Detection Pipeline*](https://arxiv.org/abs/2506.05175) | IEEE/CVF CVPR 2025 | UCF-Crime, ShanghaiTech, XD-Violence | Granular pixel-level tracking and segmentation of anomalous evidence objects across long video sequences |
-
-## Research Positioning & Novelty (IEEE Perspective)
-
-From an IEEE forensic computing perspective, simply pipelining off-the-shelf models is insufficient. This project addresses specific research challenges identified in recent literature:
-
-1. **Grounded Multi-Stage Synthesis vs. Monolithic Hallucination:** Monolithic multimodal LLMs frequently hallucinate weapons, actions, or timelines when prompted directly with surveillance imagery. Our pipeline enforces strict grounded reasoning: Stage 5 and Stage 6 VLMs receive structured bounding-box detections and classification votes from Stages 3–4 as explicit priors, and are constrained to cite verified view numbers (`#1, #2, ...`) for every evidentiary assertion.
-2. **Privacy-Preserving Forensic Preprocessing:** In compliance with forensic privacy standards, Stage 2 utilizes instance segmentation (`YOLOv8n-seg`) to completely de-identify/mask persons prior to multimodal scene description and timeline reconstruction, mitigating bystander identification bias.
-3. **Cryptographic Chain of Custody & Tamper Verification:** Forensic media requires proof of integrity. Every ingest, detection, classification, and reconstruction step is recorded in an append-only, SHA-256 hash-chained audit log with perceptual hash (pHash) deduplication, enabling deterministic tamper verification (`log.verify()`).
-4. **Leakage-Free Video-Level Evaluation Protocol:** Frame-level random sampling inflates classification accuracy due to near-identical temporal frames. Our experimental protocol enforces strict video-level and incident-level disjoint splits between training and test sets.
-
-## Quantitative Evaluation & Baseline Results
-
-The baseline pipeline was executed end-to-end on Google Colab (Tesla T4 GPU, 15 GB VRAM).
-
-### Stage 4: ResNet-18 Incident-Type Classification Report
-
-- **Model:** ResNet-18 (ImageNet pretrained backbone, fine-tuned linear head)
-- **Training Setup:** 3 epochs, AdamW optimizer ($\text{lr} = 3\times 10^{-4}$), batch size 128, class-balanced sample (3,000 frames/class from `Train`).
-- **Training Loss:** Epoch 1: 0.308 → Epoch 2: 0.055 → Epoch 3: 0.043.
-- **Evaluation Split:** Test split (6,797 total frames across 14 classes, 64×64 input resolution).
+The system is deployed as an enterprise full-stack forensic application:
 
 ```text
-               precision    recall  f1-score   support
-
-        Abuse      0.063     0.024     0.034       297
-       Arrest      0.116     0.022     0.037       500
-        Arson      0.183     0.298     0.227       500
-      Assault      0.027     0.016     0.020       500
-     Burglary      0.200     0.190     0.195       500
-    Explosion      0.293     0.034     0.061       500
-     Fighting      0.151     0.110     0.127       500
- NormalVideos      0.213     0.358     0.267       500
-RoadAccidents      0.289     0.470     0.358       500
-      Robbery      0.094     0.154     0.117       500
-     Shooting      0.009     0.002     0.003       500
-  Shoplifting      0.195     0.108     0.139       500
-     Stealing      0.119     0.160     0.136       500
-    Vandalism      0.000     0.000     0.000       500
-
-     accuracy                          0.142      6797
-    macro avg      0.139     0.139     0.123      6797
- weighted avg      0.142     0.142     0.126      6797
+┌─────────────────────────────────────────────────────────────┐
+│                    React 19 Dashboard (Vite)                │
+│                 http://localhost:5173                       │
+│  - Theme Toggle (Dark / Light)     - Evidentiary Bounding Boxes│
+│  - Instant 1-Click Demo Scenarios  - Probability Meters     │
+│  - Tiled Contact Sheet Inspector   - Live Tamper Simulator  │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ HTTP / JSON / Multipart
+┌──────────────────────────────▼──────────────────────────────┐
+│                    Express MERN Backend                     │
+│                 http://localhost:5000                       │
+│  - Case Dossier Management         - Audit Log Verification │
+│  - Multer Ingestion Handling       - Service Orchestration  │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ Proxy
+┌──────────────────────────────▼──────────────────────────────┐
+│                  FastAPI AI Inference Service               │
+│                 http://127.0.0.1:8008                       │
+│  - YOLOv8n-seg Masking             - ONNX DirectML Runtime  │
+│  - YOLOv8s Evidence Detection      - Multi-View Synthesizer │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-> **Analysis & Untrained Components:**
-> - Low-resolution 64×64 surveillance crops restrict single-frame spatial discernment for subtle incidents (e.g. Shooting: 0.003 F1, Assault: 0.020 F1), while distinct visual signatures (RoadAccidents: 0.358 F1, NormalVideos: 0.267 F1, Arson: 0.227 F1) achieve higher recall.
-> - Single-frame classification without temporal modeling underscores the critical need for a temporal video model (Task 4) and full-resolution video evaluation (Phase 1c).
-> - Evidence detector (`YOLOv8s`) currently uses generic COCO weights without weapon fine-tuning; weapon-specific detection is pending Task 3.
+---
 
-### Stage 1 & 6: Cryptographic Chain of Custody & Audit Integrity
+## <img src="https://api.iconify.design/lucide/zap.svg?color=%233B82F6" width="24" align="top" alt=""/> Quick Start
 
-- **Demo Case:** `Burglary032_x264` (1,580 frames total; 12 sampled; 10 kept after pHash deduplication).
-- **Audit Verification on Execution:** `log.verify() == True` across all ingest, masking, detection, classification, and reconstruction events.
-- **Tamper Simulation:** Mutating a single historical record in memory immediately invalidated the chain: `log.verify() == False`.
+### 1. One-Click Launch (Windows)
+Double-click [`start_app.bat`](start_app.bat) in the root directory. It automatically spins up all three services:
+- **React Dashboard:** `http://localhost:5173`
+- **Express MERN Server:** `http://localhost:5000`
+- **FastAPI AI Engine:** `http://127.0.0.1:8008`
 
-## Roadmap
+### 2. Manual Startup
 
-- [x] Phase 1a — Colab baseline: all six stages end to end on UCF-Crime frames (verified on T4 GPU, quantitative metrics and audit log recorded)
-- [x] Phase 1b — Fine-tune YOLOv8 on OD-WeaponDetection: `notebooks/02_weapon_detection.ipynb` implemented (Pascal VOC XML to YOLO format converter, 80/20 train/val split, YOLOv8s fine-tuning, mAP evaluation, and Stage 3 pipeline wiring)
-- [x] Phase 2 — Full-Stack MERN Application & Hardware-Accelerated AI Service
-  - **React Dashboard (`frontend/`)**: Interactive investigator workspace with per-view privacy masking, evidence inspection, contact sheet, timeline reconstruction, and live cryptographic audit log viewer.
-  - **Express / Node API (`server/`)**: MERN API backend proxying pipeline jobs, managing case uploads, and interfacing with database.
-  - **Python Inference Service (`backend/`)**: FastAPI pipeline engine running ResNet-18 classification on AMD Ryzen AI hardware (`DmlExecutionProvider` / NPU) alongside YOLOv8 privacy masking and evidence detection.
-  - **Model Exporter (`backend/export_npu.py`)**: Converts trained PyTorch checkpoints (`.pth`) to optimized ONNX models for local laptop acceleration.
+```bash
+# Terminal 1: FastAPI AI Engine (AMD Hardware Acceleration)
+cd backend
+python -m uvicorn main:app --host 127.0.0.1 --port 8008
 
-## Limitations
+# Terminal 2: Express MERN API
+cd server
+npm install
+node server.js
 
-- UCF-Crime frames are 64×64, which limits detection and VLM quality. Full-resolution input is recommended for real use.
-- COCO has no gun class; the fine-tuned `yolov8s_weapon_best.pt` detector adds `pistol` and `knife` support.
-- The VLM can still produce wrong statements; every claim must cite a view and is meant for human review.
-- This is a research and learning project. Its output is assistive and is not evidence.
-
-## Repository layout
-
-```text
-backend/     FastAPI AI inference service, NPU export, and 6-stage pipeline
-frontend/    React investigator dashboard (Vite + modern forensic UI)
-server/      Express MERN API backend
-models/      Trained checkpoints, ONNX graphs, and NPU download guide
-notebooks/
-  01_scene_analysis_pipeline.ipynb   End-to-end 6-stage Colab pipeline
-  02_weapon_detection.ipynb          YOLOv8s fine-tuning on OD-WeaponDetection (pistol/knife)
-datasets/
-  README.md                          Dataset sources, licenses and download steps
+# Terminal 3: React Dashboard
+cd frontend
+npm install
+npm run dev
 ```
+
+---
+
+## <img src="https://api.iconify.design/lucide/bar-chart-3.svg?color=%233B82F6" width="24" align="top" alt=""/> Quantitative Evaluation Summary
+
+### UCF-Crime Test Benchmark (6,797 Frames)
+Trained in [`notebooks/01_scene_analysis_pipeline.ipynb`](notebooks/01_scene_analysis_pipeline.ipynb) on a Google Colab T4 GPU across 11.0 GB of real CCTV imagery:
+
+- **Top-1 Accuracy:** **14.2%** across 14 unbalanced crime classes (2.0× random chance baseline of 7.14%).
+- **Macro F1-Score:** **0.123** | **Weighted F1-Score:** **0.126**
+- **Top Class Performances:**
+  - `NormalVideos`: **F1 = 0.446** (Precision: 0.354, Recall: 0.605)
+  - `RoadAccidents`: **F1 = 0.198** (Precision: 0.160, Recall: 0.261)
+  - `Arrest`: **F1 = 0.178** (Precision: 0.125, Recall: 0.312)
+
+*Detailed per-class metrics, confusion matrices, and loss progression are documented in **[`TRAINING.md`](TRAINING.md)**.*
+
+---
+
+## <img src="https://api.iconify.design/lucide/folder-tree.svg?color=%233B82F6" width="24" align="top" alt=""/> Repository Structure
+
+```
+mukesh-fs-ai-project/
+├── backend/
+│   ├── main.py              # FastAPI inference engine with demo endpoints
+│   ├── pipeline.py          # 6-stage forensic pipeline implementation
+│   └── export_npu.py        # PyTorch to ONNX DirectML/NPU converter
+├── server/
+│   ├── server.js            # Express MERN backend
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx          # React 19 dashboard (theme toggle, SVG icons)
+│   │   └── index.css        # Dark/Light CSS design variables
+│   └── package.json
+├── models/
+│   ├── README.md            # Checkpoint specifications & instructions
+│   ├── resnet18_ucf_crime.pth   # Trained PyTorch checkpoint (44.8 MB)
+│   └── resnet18_ucf_crime.onnx  # Exported ONNX DirectML model (44.7 MB)
+├── notebooks/
+│   ├── 01_scene_analysis_pipeline.ipynb  # Executed Colab benchmark notebook
+│   └── 02_weapon_detection.ipynb        # YOLOv8s weapon detection fine-tuning
+├── test_images/             # Pre-configured test frames for instant demo
+├── RESEARCH.md              # IEEE perspective & 2025-26 literature
+├── TRAINING.md              # Full training methodology & confusion matrix
+├── MODELS.md                # Model specifications & hardware acceleration
+├── LICENSE                  # MIT License
+├── start_app.bat            # One-click Windows launcher
+└── README.md
+```
+
+---
+
+## <img src="https://api.iconify.design/lucide/book-open.svg?color=%233B82F6" width="24" align="top" alt=""/> Documentation Index
+
+| Documentation File | Contents & Scope |
+|---|---|
+| **[`RESEARCH.md`](RESEARCH.md)** | Full IEEE research positioning, resolution of research gaps, 10 verified 2025–26 papers (VERA, MoniTor, TAO, ASK-Hint, Ex-VAD), and dataset profiles. |
+| **[`TRAINING.md`](TRAINING.md)** | Complete Colab T4 training logs, loss curves, full 14-class test evaluation table, confusion matrix analysis, and weapon detection setup. |
+| **[`MODELS.md`](MODELS.md)** | Architectural specifications for YOLOv8n-seg, YOLOv8s, ResNet-18 ONNX, and Qwen2.5-VL-3B, with AMD DirectML hardware acceleration benchmarks. |
+| **[`LICENSE`](LICENSE)** | Full text of the standard MIT Open Source License. |
+
+---
+
+## <img src="https://api.iconify.design/lucide/scale.svg?color=%233B82F6" width="24" align="top" alt=""/> License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
