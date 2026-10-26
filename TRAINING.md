@@ -162,3 +162,27 @@ print("Tampered audit valid:", log.verify())
 ```
 
 The mathematical proof guarantees that any alteration to prior evidence frames, timestamps, or detection records invalidates all subsequent hash links in the chain.
+
+## 5. Violence vs Non-Violence on RLVS (notebook 04)
+
+Code: [`training/violence_classifier.py`](training/violence_classifier.py), run in [`notebooks/04_violence_classification_rlvs.ipynb`](notebooks/04_violence_classification_rlvs.ipynb). Raw results: [`results/rlvs_results.json`](results/rlvs_results.json).
+
+- **Data:** RLVS from Kaggle, 4,000 clips (2,000 violence, 2,000 non-violence). 16 frames per clip, frozen CLIP ViT-B/16 features. Split into 2,478 / 688 / 834 train / validation / test clips.
+- **Model choice:** the temporal head (60 epochs, best epoch 16 on validation) was chosen because it scored higher on validation (98.3% against 97.1% for logistic regression). On the test clips the logistic regression scored higher (99.0%); both are reported. The headline result is the model chosen on validation.
+- **Grouping:** clips whose CLIP embeddings have cosine similarity of at least 0.97 were grouped (1,268 groups) so they cannot sit on both sides of a split. This only merges near-identical clips, so some looser overlap between train and test (for example different cuts of one source video) may remain. The plain random split scored 99.9%, a small difference, so grouping at this threshold changes little.
+- **Limits:** RLVS includes staged and movie fights and is a fairly easy dataset; these numbers do **not** show that the model works on real CCTV. A cross-dataset test on RWF-2000 is the next step.
+
+| Model | Test accuracy (95% interval) | Macro-F1 | ROC-AUC | Violence recall / precision |
+|---|---|---|---|---|
+| **Temporal head (chosen on validation)** | **95.4%** (94.0% to 96.8%) | 0.954 | 0.977 | 93.7% / 97.7% |
+| Logistic regression | 99.0% (98.3% to 99.6%) | 0.990 | 0.999 | 99.1% / 99.1% |
+| Logistic regression, plain random clip split (comparison only) | 99.9% | 0.999 | 1.000 | 99.7% / 100.0% |
+
+Test confusion matrices (rows: true class, columns: predicted; order non-violence, violence):
+
+| Model | True non-violence | True violence |
+|---|---|---|
+| Temporal head | 380 correct, 10 flagged as violence | 416 found, 28 missed |
+| Logistic regression | 386 correct, 4 flagged as violence | 440 found, 4 missed |
+
+The 95% intervals are bootstrap intervals over the 834 test clips.

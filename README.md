@@ -168,7 +168,22 @@ Two measured runs on the official UCF-Crime **test** split, both on a Google Col
 - The 50-epoch model reaches 99.6% training accuracy but 21.1% test accuracy: it **overfits** the training videos.
 - Weakest classes: Abuse, Assault and Fighting (F1 = 0). Best: RoadAccidents (0.342), Arson (0.304), NormalVideos (0.303).
 - Likely causes: 64x64 frames, one weak label per video (most frames of a crime video look normal), and frame-by-frame classification.
-- **Next step:** train on cleaner, smaller datasets (violence detection and weapon detection) instead of the 14-class UCF-Crime frames. This section will be updated with measured results; nothing here is a projected number.
+- **Next step:** the cleaner two-class task below, then a cross-dataset test on RWF-2000 and a pistol/knife detector. Every number in this README was measured.
+
+### Violence vs non-violence on RLVS (notebook 04)
+
+After the 14-class results above, the classification task was moved to a cleaner, smaller dataset with two classes. Measured on 834 held-out test clips ([`results/rlvs_results.json`](results/rlvs_results.json)):
+
+| Model | Test accuracy (95% interval) | Macro-F1 | ROC-AUC | Violence recall / precision |
+|---|---|---|---|---|
+| **Temporal head (chosen on validation)** | **95.4%** (94.0% to 96.8%) | 0.954 | 0.977 | 93.7% / 97.7% |
+| Logistic regression | 99.0% (98.3% to 99.6%) | 0.990 | 0.999 | 99.1% / 99.1% |
+| Logistic regression, plain random clip split (comparison only) | 99.9% | 0.999 | 1.000 | 99.7% / 100.0% |
+
+- **Data:** RLVS from Kaggle, 4,000 clips (2,000 violence, 2,000 non-violence). 16 frames per clip, frozen CLIP ViT-B/16 features. Split into 2,478 / 688 / 834 train / validation / test clips.
+- **Model choice:** the temporal head (60 epochs, best epoch 16 on validation) was chosen because it scored higher on validation (98.3% against 97.1% for logistic regression). On the test clips the logistic regression scored higher (99.0%); both are reported. The headline result is the model chosen on validation.
+- **Grouping:** clips whose CLIP embeddings have cosine similarity of at least 0.97 were grouped (1,268 groups) so they cannot sit on both sides of a split. This only merges near-identical clips, so some looser overlap between train and test (for example different cuts of one source video) may remain. The plain random split scored 99.9%, a small difference, so grouping at this threshold changes little.
+- **Limits:** RLVS includes staged and movie fights and is a fairly easy dataset; these numbers do **not** show that the model works on real CCTV. A cross-dataset test on RWF-2000 is the next step.
 
 *Per-class metrics, training settings and curves are in **[`TRAINING.md`](TRAINING.md)**.*
 

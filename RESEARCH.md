@@ -108,6 +108,8 @@ Each entry states how it was verified. **Abstract read** means the abstract page
 |---|---|---|---|---|
 | **UCF-Crime** | Real CCTV videos; the Kaggle copy holds every 10th frame as 64x64 PNG | 13 crime classes + Normal (1,900 videos); 14 folders in the Kaggle copy | Stage 4 ResNet-18 incident classification (measured, low accuracy: see TRAINING.md) | [UCF-Crime frames (Kaggle)](https://www.kaggle.com/datasets/odins0n/ucf-crime-dataset) |
 | **OD-WeaponDetection** | High-res scene photos | Handguns, Knives, SOHAs | Stage 3 YOLOv8s weapon fine-tuning (planned, not yet trained) ([`notebooks/02_weapon_detection.ipynb`](notebooks/02_weapon_detection.ipynb)) | [GitHub (ari-dasci)](https://github.com/ari-dasci/OD-WeaponDetection) |
+| **RLVS** (Real Life Violence Situations) | Short clips from YouTube, including staged and movie fights | 4,000 clips: 2,000 violence, 2,000 non-violence | Violence classification, notebook 04 (measured) | [RLVS (Kaggle)](https://www.kaggle.com/datasets/mohamedmustafa/real-life-violence-situations-dataset) |
+| **RWF-2000** | Real surveillance-camera clips | 2,000 clips, 1,000 violent and 1,000 non-violent, predefined 80/20 split | Planned cross-dataset test | [RWF-2000 paper](https://deepai.org/publication/rwf-2000-an-open-large-scale-video-database-for-violence-detection) |
 | **XD-Violence** | Multimodal audio-visual | 6 violent classes (4,754 clips) | Baseline comparison for multimodal anomaly classification | [XD-Violence](https://roc-ng.github.io/XD-Violence/) |
 | **ShanghaiTech Campus** | Fixed CCTV streams | 13 scenes, 437 anomaly events | Cross-domain perimeter and pedestrian anomaly reference | [ShanghaiTech](https://svip-lab.github.io/dataset/campus_dataset.html) |
 

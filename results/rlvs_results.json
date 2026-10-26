@@ -1,0 +1,43 @@
+{
+  "dataset": "RLVS (Kaggle: mohamedmustafa/real-life-violence-situations-dataset)",
+  "n_clips": 4000,
+  "frames_per_clip": 16,
+  "features": "CLIP ViT-B/16, frozen",
+  "split": "grouped by near-duplicate similarity",
+  "group_threshold": 0.97,
+  "n_groups": 1268,
+  "train_val_test_clips": [2478, 688, 834],
+  "chosen_on_validation": "temporal_head",
+  "logistic_regression": {
+    "n_clips": 834,
+    "accuracy": 0.9904076738609112,
+    "accuracy_ci95": [0.9832134292565947, 0.9964028776978417],
+    "macro_f1": 0.9903672903672904,
+    "violence_precision": 0.990990990990991,
+    "violence_recall": 0.990990990990991,
+    "roc_auc": 0.9988218988218989,
+    "confusion_matrix": [[386, 4], [4, 440]]
+  },
+  "temporal_head": {
+    "n_clips": 834,
+    "accuracy": 0.9544364508393285,
+    "accuracy_ci95": [0.9400479616306955, 0.9676258992805755],
+    "macro_f1": 0.954351395730706,
+    "violence_precision": 0.9765258215962441,
+    "violence_recall": 0.9369369369369369,
+    "roc_auc": 0.9765303765303766,
+    "confusion_matrix": [[380, 10], [28, 416]]
+  },
+  "random_clip_split_logreg_for_comparison": {
+    "n_clips": 834,
+    "accuracy": 0.9988009592326139,
+    "accuracy_ci95": [0.9964028776978417, 1.0],
+    "macro_f1": 0.9987971390948543,
+    "violence_precision": 1.0,
+    "violence_recall": 0.9974619289340102,
+    "roc_auc": 1.0,
+    "confusion_matrix": [[440, 0], [1, 393]]
+  },
+  "validation_accuracy": {"logistic_regression": 0.971, "temporal_head": 0.983, "temporal_head_best_epoch": 16, "epochs_trained": 60},
+  "note": "Copied from results.json on Google Drive (crime_scene_runs/rlvs) after the Colab run; validation accuracies are from the notebook output."
+}
