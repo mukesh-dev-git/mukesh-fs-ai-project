@@ -26,9 +26,10 @@ Trained in [`notebooks/01_scene_analysis_pipeline.ipynb`](notebooks/01_scene_ana
 ### 2.1 Optimization Parameters
 - **Architecture:** ResNet-18 (modified `fc` layer: 512 $\to$ 14 outputs)
 - **Input Resolution:** $112 \times 112 \times 3$, ImageNet normalized
-- **Loss Function:** Weighted Cross-Entropy Loss (addressing class imbalance)
-- **Optimizer:** Adam ($\text{lr} = 1 \times 10^{-4}$)
-- **Batch Size:** 64
+- **Loss Function:** Cross-Entropy Loss (unweighted)
+- **Optimizer:** AdamW (lr = 3e-4)
+- **Batch Size:** 128
+- **Data:** 3,000 randomly sampled train frames per class (42,000 total); test: 500 random frames per class from the official Test split
 - **Epochs:** 3
 
 ### 2.2 Training Loss Progression
@@ -39,30 +40,76 @@ Epoch 2/3 | Batch Loss: 0.055  | Cumulative Epoch Loss: 78.41
 Epoch 3/3 | Batch Loss: 0.043  | Cumulative Epoch Loss: 42.16
 ```
 
-### 2.3 Quantitative Evaluation on Test Set (6,797 Frames)
+### 2.3 Baseline: Evaluation on the Test Set (6,797 Frames, notebook 01)
 
-Evaluated across the held-out test split of 6,797 frames across all 14 incident classes:
+Measured on 6,797 frames (500 random frames per class from the official Test split; Abuse has 297):
 
 | Class Name | Precision | Recall | F1-Score | Test Support |
 |---|---|---|---|---|
-| **Abuse** | 0.050 | 0.088 | 0.064 | 227 |
-| **Arrest** | 0.125 | 0.312 | 0.178 | 449 |
-| **Arson** | 0.069 | 0.103 | 0.083 | 290 |
-| **Assault** | 0.071 | 0.099 | 0.083 | 284 |
-| **Burglary** | 0.092 | 0.111 | 0.101 | 557 |
-| **Explosion** | 0.048 | 0.079 | 0.060 | 254 |
-| **Fighting** | 0.101 | 0.170 | 0.127 | 370 |
-| **NormalVideos** | 0.354 | 0.605 | **0.446** | 1,733 |
-| **RoadAccidents** | 0.160 | 0.261 | **0.198** | 445 |
-| **Robbery** | 0.122 | 0.149 | 0.134 | 569 |
-| **Shooting** | 0.043 | 0.042 | 0.043 | 288 |
-| **Shoplifting** | 0.076 | 0.086 | 0.081 | 486 |
-| **Stealing** | 0.085 | 0.093 | 0.089 | 572 |
-| **Vandalism** | 0.051 | 0.074 | 0.060 | 473 |
-| **Macro Average** | **0.103** | **0.162** | **0.123** | **6,797** |
-| **Weighted Average** | **0.148** | **0.233** | **0.126** | **6,797** |
+| **Abuse** | 0.063 | 0.024 | 0.034 | 297 |
+| **Arrest** | 0.116 | 0.022 | 0.037 | 500 |
+| **Arson** | 0.183 | 0.298 | 0.227 | 500 |
+| **Assault** | 0.027 | 0.016 | 0.020 | 500 |
+| **Burglary** | 0.200 | 0.190 | 0.195 | 500 |
+| **Explosion** | 0.293 | 0.034 | 0.061 | 500 |
+| **Fighting** | 0.151 | 0.110 | 0.127 | 500 |
+| **NormalVideos** | 0.213 | 0.358 | 0.267 | 500 |
+| **RoadAccidents** | 0.289 | 0.470 | **0.358** | 500 |
+| **Robbery** | 0.094 | 0.154 | 0.117 | 500 |
+| **Shooting** | 0.009 | 0.002 | 0.003 | 500 |
+| **Shoplifting** | 0.195 | 0.108 | 0.139 | 500 |
+| **Stealing** | 0.119 | 0.160 | 0.136 | 500 |
+| **Vandalism** | 0.000 | 0.000 | 0.000 | 500 |
+| **Accuracy** | | | **0.142** | **6,797** |
+| **Macro Average** | **0.139** | **0.139** | **0.123** | **6,797** |
+| **Weighted Average** | **0.142** | **0.142** | **0.126** | **6,797** |
 
-> **Evaluation Takeaway:** On raw CCTV surveillance frames without temporal optical flow, the top-performing classes are **NormalVideos (F1: 0.446)**, **RoadAccidents (F1: 0.198)**, and **Arrest (F1: 0.178)**. Overall top-1 classification accuracy across 14 unbalanced classes is **14.2%** (2.0× random chance baseline of 7.14%). In multi-view case voting (Stage 4), aggregate accuracy increases significantly because multi-frame consensus filters transient single-frame mispredictions.
+> **Takeaway:** 14.2% is about twice chance (7.1%). The best classes are RoadAccidents (F1 0.358), NormalVideos (0.267) and Arson (0.227). The classifier is a weak baseline.
+
+### 2.4 Retrain: 50 Epochs with a Video-Level Split (notebook 03)
+
+Following the review request for at least 50 epochs, the classifier was retrained with [`training/train_classifier.py`](training/train_classifier.py) (run in [`notebooks/03_train_classifier_50ep.ipynb`](notebooks/03_train_classifier_50ep.ipynb)).
+
+- **Model and settings:** ImageNet-pretrained ResNet-18, 112x112 input, AdamW (lr 3e-4, weight decay 0.05), 3-epoch warm-up then cosine decay, label smoothing 0.1, RandAugment, batch 128, mixed precision, 50 epochs.
+- **Data split by video:** training uses 32,956 frames (balanced, 2,354 per class); validation is 25,955 frames from 237 held-out videos; the test set is 13,564 frames from 290 videos of the official Test split. The script asserts that no video appears in both training and validation.
+- **Model selection:** the checkpoint with the best validation macro-F1 (epoch 25) is evaluated once on the test set.
+
+| Epoch | Train loss | Train acc. | Val acc. (frames) | Val macro-F1 | Val acc. (videos) |
+|---|---|---|---|---|---|
+| 1 | 2.376 | 0.269 | 0.281 | 0.170 | 0.321 |
+| 5 | 0.737 | 0.958 | 0.515 | 0.224 | 0.553 |
+| 12 | 0.625 | 0.985 | 0.545 | 0.200 | 0.603 |
+| 25 (selected) | 0.589 | 0.991 | 0.552 | 0.229 | 0.570 |
+| 28 | 0.582 | 0.992 | 0.565 | 0.221 | 0.578 |
+
+**Test results (13,564 frames, 290 videos):**
+
+| Metric | Value |
+|---|---|
+| Frame accuracy | **21.1%** |
+| Macro-F1 | **0.145** |
+| Video-level accuracy (mean of frame probabilities) | **49.3%** |
+| Chance level | 7.1% |
+
+| Class | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| Abuse | 0.000 | 0.000 | 0.000 | 240 |
+| Arrest | 0.182 | 0.178 | 0.180 | 600 |
+| Arson | 0.344 | 0.272 | 0.304 | 1,000 |
+| Assault | 0.000 | 0.000 | 0.000 | 360 |
+| Burglary | 0.354 | 0.117 | 0.176 | 1,496 |
+| Explosion | 0.298 | 0.081 | 0.128 | 1,500 |
+| Fighting | 0.000 | 0.000 | 0.000 | 591 |
+| NormalVideos | 0.184 | 0.845 | 0.303 | 1,500 |
+| RoadAccidents | 0.417 | 0.290 | 0.342 | 1,500 |
+| Robbery | 0.145 | 0.302 | 0.196 | 600 |
+| Shooting | 0.369 | 0.046 | 0.082 | 1,500 |
+| Shoplifting | 0.628 | 0.062 | 0.113 | 1,500 |
+| Stealing | 0.099 | 0.147 | 0.118 | 600 |
+| Vandalism | 0.102 | 0.080 | 0.089 | 577 |
+| **Macro / weighted avg** | 0.223 / 0.297 | 0.173 / 0.211 | **0.145 / 0.174** | 13,564 |
+
+> **Takeaway:** all 50 epochs were run, but accuracy stays low. Validation accuracy (about 55%) overstated performance because the validation set contains many NormalVideos frames; on the test set the model over-predicts NormalVideos (recall 0.845, precision 0.184) and never predicts Abuse, Assault or Fighting correctly. Training accuracy (99.6%) against 21.1% test accuracy shows overfitting. The inputs are 64x64 frames with one weak label per video, which limits this task. The next step is to move to cleaner, smaller datasets (see the README).
 
 ---
 

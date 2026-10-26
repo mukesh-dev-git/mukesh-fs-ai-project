@@ -16,9 +16,9 @@
 | Model Identifier | Architectural Family | Input Resolution | Task / Role in Pipeline | Weights Status |
 |---|---|---|---|---|
 | **`YOLOv8n-seg`** | Nano Segmentation CNN | $640 \times 640$ | Stage 2: Privacy masking & bystander de-identification (`class 0: person`) | Loaded via Ultralytics (`yolov8n-seg.pt`) |
-| **`YOLOv8s`** | Small Detection CNN | $640 \times 640$ | Stage 3: Evidence & weapon detection (`knife`, `pistol`, `vehicles`, `tools`) | Fine-tuning via [`notebooks/02_weapon_detection.ipynb`](notebooks/02_weapon_detection.ipynb) |
+| **`YOLOv8s`** | Small Detection CNN | $640 \times 640$ | Stage 3: Evidence & object detection (COCO classes such as `knife`, `vehicles`, `bag`) | COCO-pretrained weights are used today. A pistol/knife fine-tune ([`notebooks/02_weapon_detection.ipynb`](notebooks/02_weapon_detection.ipynb)) is written but **not yet trained** |
 | **`ResNet-18 (ONNX)`** | Residual Network | $112 \times 112$ | Stage 4: 14-class UCF-Crime incident classification | Trained checkpoint (`models/resnet18_ucf_crime.onnx`, 44.7 MB) |
-| **`Qwen2.5-VL-3B`** | Vision-Language Foundation | Dynamic Contact Sheet | Stage 5: Multimodal scene reconstruction & cited case story synthesis | Hugging Face Hub / Grounded Engine |
+| **`Qwen2.5-VL-3B`** | Vision-Language Foundation | Dynamic Contact Sheet | Stage 5: Multimodal scene reconstruction & cited case story synthesis | Run in notebook 01 only; the web app's case story is currently rule-based and does not call this model |
 
 ---
 
@@ -47,7 +47,7 @@
 
 - **Parameters:** 11.2 Million
 - **Target Vocabulary:**
-  - **Weapons:** `knife`, `scissors`, `baseball bat`, `pistol`, `gun`
+  - **Weapons (COCO classes today):** `knife`, `scissors`, `baseball bat`. COCO has no `pistol` or `gun` class; adding them needs the planned fine-tune
   - **Vehicles:** `car`, `motorcycle`, `truck`, `bus`, `bicycle`
   - **Items:** `backpack`, `handbag`, `suitcase`, `bottle`, `cell phone`, `laptop`
 - **Visual Output:** Generates high-contrast bounding boxes with category tags and confidence percentages directly overlaid onto privacy-masked imagery.

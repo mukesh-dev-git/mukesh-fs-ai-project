@@ -155,17 +155,22 @@ npm run dev
 
 ## <img src="https://api.iconify.design/lucide/bar-chart-3.svg?color=%233B82F6" width="24" align="top" alt=""/> Quantitative Evaluation Summary
 
-### UCF-Crime Test Benchmark (6,797 Frames)
-Trained in [`notebooks/01_scene_analysis_pipeline.ipynb`](notebooks/01_scene_analysis_pipeline.ipynb) on a Google Colab T4 GPU across 11.0 GB of real CCTV imagery:
+### UCF-Crime Test Benchmark (14 classes, chance = 7.1%)
 
-- **Top-1 Accuracy:** **14.2%** across 14 unbalanced crime classes (2.0× random chance baseline of 7.14%).
-- **Macro F1-Score:** **0.123** | **Weighted F1-Score:** **0.126**
-- **Top Class Performances:**
-  - `NormalVideos`: **F1 = 0.446** (Precision: 0.354, Recall: 0.605)
-  - `RoadAccidents`: **F1 = 0.198** (Precision: 0.160, Recall: 0.261)
-  - `Arrest`: **F1 = 0.178** (Precision: 0.125, Recall: 0.312)
+Two measured runs on the official UCF-Crime **test** split, both on a Google Colab T4 GPU:
 
-*Detailed per-class metrics, confusion matrices, and loss progression are documented in **[`TRAINING.md`](TRAINING.md)**.*
+| Run | Test set | Frame accuracy | Macro-F1 | Video-level accuracy |
+|---|---|---|---|---|
+| Baseline, 3 epochs ([notebook 01](notebooks/01_scene_analysis_pipeline.ipynb)) | 6,797 frames (500 random per class) | **14.2%** | **0.123** | not measured |
+| Retrain, 50 epochs, video-level split ([notebook 03](notebooks/03_train_classifier_50ep.ipynb)) | 13,564 frames from 290 videos | **21.1%** | **0.145** | **49.3%** |
+
+- The two test samples are drawn differently, so the comparison is approximate.
+- The 50-epoch model reaches 99.6% training accuracy but 21.1% test accuracy: it **overfits** the training videos.
+- Weakest classes: Abuse, Assault and Fighting (F1 = 0). Best: RoadAccidents (0.342), Arson (0.304), NormalVideos (0.303).
+- Likely causes: 64x64 frames, one weak label per video (most frames of a crime video look normal), and frame-by-frame classification.
+- **Next step:** train on cleaner, smaller datasets (violence detection and weapon detection) instead of the 14-class UCF-Crime frames. This section will be updated with measured results; nothing here is a projected number.
+
+*Per-class metrics, training settings and curves are in **[`TRAINING.md`](TRAINING.md)**.*
 
 ---
 
@@ -207,7 +212,7 @@ mukesh-fs-ai-project/
 
 | Documentation File | Contents & Scope |
 |---|---|
-| **[`RESEARCH.md`](RESEARCH.md)** | Full IEEE research positioning, resolution of research gaps, 10 verified 2025–26 papers (VERA, MoniTor, TAO, ASK-Hint, Ex-VAD), and dataset profiles. |
+| **[`RESEARCH.md`](RESEARCH.md)** | Full IEEE research positioning, resolution of research gaps, 10 papers from 2025-26 (each marked with how it was verified), and dataset profiles. |
 | **[`TRAINING.md`](TRAINING.md)** | Complete Colab T4 training logs, loss curves, full 14-class test evaluation table, confusion matrix analysis, and weapon detection setup. |
 | **[`MODELS.md`](MODELS.md)** | Architectural specifications for YOLOv8n-seg, YOLOv8s, ResNet-18 ONNX, and Qwen2.5-VL-3B, with AMD DirectML hardware acceleration benchmarks. |
 | **[`LICENSE`](LICENSE)** | Full text of the standard MIT Open Source License. |
